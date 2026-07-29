@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Non-Functional Testing Playbook - Interactive Dashboard</title>
+  
+  <meta name="description" content="An interactive, comprehensive course on Non-Functional Testing -- Performance, Security, Usability, Accessibility, Reliability, Compatibility, and more -- grounded in real project case studies.">
+  <meta name="color-scheme" content="light dark">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Prism.js for code syntax highlighting (Tomorrow Night dark theme works beautifully in both light & dark layouts for contrast) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" id="prism-theme">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Inline Script to prevent Flash of Unstyled Content (FOUC) by applying theme before rendering -->
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem('testing-guide-theme') || 'system';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = storedTheme === 'dark' || (storedTheme === 'system' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+      document.documentElement.setAttribute('data-theme-setting', storedTheme);
+    })();
+  </script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#00_Table_of_Contents.md" class="logo-area" aria-label="Go to homepage / Table of Contents">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          <span class="logo-text">NFT Playbook</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="search-box-container">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="quick-search" placeholder="Search guide... (Press '/')" aria-label="Search study guide">
+          <button id="search-clear" class="search-clear-btn" aria-label="Clear search" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#" class="nav-link active" data-file="00_Table_of_Contents.md" id="nav-toc">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <span>Table of Contents</span>
+            </a>
+          </li>
+          
+          <li class="nav-group-title">1. Foundation</li>
+          <li class="nav-item">
+            <a href="#Part_01_NFT_Fundamentals_ISO25010.md" class="nav-link" data-file="Part_01_NFT_Fundamentals_ISO25010.md">
+              <span class="part-num">01</span>
+              <span>NFT Fundamentals & ISO 25010</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">2. Performance Testing</li>
+          <li class="nav-item">
+            <a href="#Part_02_Performance_Testing_Load_Stress.md" class="nav-link" data-file="Part_02_Performance_Testing_Load_Stress.md">
+              <span class="part-num">02</span>
+              <span>Load & Stress Testing</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_03_Performance_Testing_Spike_Soak_Scalability.md" class="nav-link" data-file="Part_03_Performance_Testing_Spike_Soak_Scalability.md">
+              <span class="part-num">03</span>
+              <span>Spike, Soak & Scalability</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">3. Security Testing 🔒</li>
+          <li class="nav-item">
+            <a href="#Part_04_Security_Testing_Fundamentals_OWASP.md" class="nav-link" data-file="Part_04_Security_Testing_Fundamentals_OWASP.md">
+              <span class="part-num">04</span>
+              <span>Security I — OWASP & Fundamentals</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_05_Security_Testing_PenTesting_DevSecOps.md" class="nav-link" data-file="Part_05_Security_Testing_PenTesting_DevSecOps.md">
+              <span class="part-num">05</span>
+              <span>Security II — Pen Testing & DevSecOps</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">4. User-Facing Quality</li>
+          <li class="nav-item">
+            <a href="#Part_06_Usability_Interaction_Testing.md" class="nav-link" data-file="Part_06_Usability_Interaction_Testing.md">
+              <span class="part-num">06</span>
+              <span>Usability & Interaction</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_07_Accessibility_Testing.md" class="nav-link" data-file="Part_07_Accessibility_Testing.md">
+              <span class="part-num">07</span>
+              <span>Accessibility Testing</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_08_Compatibility_Testing.md" class="nav-link" data-file="Part_08_Compatibility_Testing.md">
+              <span class="part-num">08</span>
+              <span>Compatibility Testing</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">5. System Qualities</li>
+          <li class="nav-item">
+            <a href="#Part_09_Reliability_Availability_Recovery_Testing.md" class="nav-link" data-file="Part_09_Reliability_Availability_Recovery_Testing.md">
+              <span class="part-num">09</span>
+              <span>Reliability, Availability & Recovery</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_10_Maintainability_Portability_Testing.md" class="nav-link" data-file="Part_10_Maintainability_Portability_Testing.md">
+              <span class="part-num">10</span>
+              <span>Maintainability & Portability</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_11_Compliance_Privacy_Localization_Testing.md" class="nav-link" data-file="Part_11_Compliance_Privacy_Localization_Testing.md">
+              <span class="part-num">11</span>
+              <span>Compliance, Privacy & Localization</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">6. Strategy & Trends</li>
+          <li class="nav-item">
+            <a href="#Part_12_NFT_Test_Planning_Strategy.md" class="nav-link" data-file="Part_12_NFT_Test_Planning_Strategy.md">
+              <span class="part-num">12</span>
+              <span>NFT Test Planning & Strategy</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#Part_13_NFT_CICD_Chaos_Modern_Trends.md" class="nav-link" data-file="Part_13_NFT_CICD_Chaos_Modern_Trends.md">
+              <span class="part-num">13</span>
+              <span>CI/CD, Chaos & Modern Trends</span>
+            </a>
+          </li>
+
+          <li class="nav-group-title">Utilities</li>
+          <li class="nav-item">
+            <button id="print-full-guide" class="print-btn-sidebar" title="Print entire guide to PDF">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Print Full Guide (PDF)</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="progress-stats">
+          <div class="stats-label">Overall Progress</div>
+          <div class="stats-progress-container">
+            <div class="stats-progress-bar" id="overall-progress-bar" style="width: 0%;"></div>
+          </div>
+          <div class="stats-text" id="overall-progress-text">0 / 12 Parts Read</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="header">
+        <div class="header-left">
+          <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          
+          <div class="breadcrumbs" id="breadcrumbs">
+            <span class="breadcrumb-item">Study Guide</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active" id="current-breadcrumb">Table of Contents</span>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <!-- Toggle Theme Trigger -->
+          <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
+            <!-- Sun Icon (visible in light theme) -->
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <!-- Moon Icon (visible in dark theme) -->
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Toggle Progress Read State -->
+          <button class="mark-read-btn" id="mark-read-toggle" aria-label="Mark page as read" style="display: none;">
+            <svg class="unread-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+            <svg class="read-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span class="btn-text">Mark as Read</span>
+          </button>
+        </div>
+
+        <!-- Scroll progress bar -->
+        <div class="scroll-progress-container">
+          <div class="scroll-progress-bar" id="scroll-progress-bar" style="width: 0%;"></div>
+        </div>
+      </header>
+      
+      <!-- Content Container -->
+      <div class="content-container">
+        
+        <!-- Loading Skeleton (Pulse animation) -->
+        <div class="skeleton-container" id="skeleton">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-line" style="width: 40%"></div>
+          <div class="skeleton-divider"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line" style="width: 90%"></div>
+          <div class="skeleton-line" style="width: 95%"></div>
+          <div class="skeleton-line" style="width: 60%"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line" style="width: 85%"></div>
+        </div>
+
+        <!-- Actual Rendered Article -->
+        <article class="markdown-body" id="content" style="display: none;">
+          <!-- Markdown contents injected here -->
+        </article>
+
+        <!-- Navigation Buttons at bottom -->
+        <div class="content-navigation" id="content-nav" style="display: none;">
+          <a href="#" class="nav-btn prev-btn" id="prev-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <div class="nav-btn-info">
+              <span class="nav-btn-label">Previous Part</span>
+              <span class="nav-btn-title" id="prev-part-title">...</span>
+            </div>
+          </a>
+          
+          <a href="#" class="nav-btn next-btn" id="next-part">
+            <div class="nav-btn-info">
+              <span class="nav-btn-label">Next Part</span>
+              <span class="nav-btn-title" id="next-part-title">...</span>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Search Results Overlay Modal -->
+  <div class="search-overlay" id="search-modal">
+    <div class="search-modal-container">
+      <div class="search-modal-header">
+        <svg class="search-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="modal-search-input" placeholder="Search across all 13 study guide parts..." aria-label="Search guide text">
+        <button class="search-modal-close" id="search-modal-close" aria-label="Close search">
+          <kbd>ESC</kbd>
+        </button>
+      </div>
+      
+      <div class="search-modal-body">
+        <div class="search-indexing-status" id="search-index-status">
+          <div class="spinner"></div>
+          <span>Indexing guide contents in background for full-text search...</span>
+        </div>
+        <div class="search-results-container" id="search-results">
+          <div class="search-empty-state">
+            <p>Type keywords to search the entire study guide</p>
+            <div class="search-tips">
+              <strong>Tips:</strong>
+              <ul>
+                <li>Press <kbd>Enter</kbd> to search</li>
+                <li>Search for specific templates (e.g. <code>RTM</code>, <code>IEEE 829</code>, <code>Bug Report</code>)</li>
+                <li>Search for interview questions by typing <code>Interview</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Back to Top Button -->
+  <button class="back-to-top" id="back-to-top-btn" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <!-- External JS libraries -->
+  <!-- Marked.js for parsing markdown client-side -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <!-- Prism.js for syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <!-- Load specific Prism languages needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <!-- Mermaid.js for drawing dynamic flowcharts & mindmaps -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <!-- Print Compiling Loader Overlay -->
+  <div class="print-loading-overlay" id="print-loading-overlay">
+    <div class="print-loading-card">
+      <div class="spinner-lg"></div>
+      <h3>Compiling PDF Document</h3>
+      <p>Fetching and rendering all 13 study guide parts. This may take a few seconds...</p>
+      <div class="print-progress-wrapper">
+        <div class="print-progress-bar" id="print-compilation-progress-bar" style="width: 0%;"></div>
+      </div>
+      <div class="print-progress-text" id="print-compilation-progress-text">Preparing...</div>
+    </div>
+  </div>
+
+  <!-- Print Container (Only visible in print media) -->
+  <div id="print-container"></div>
+
+  <!-- Custom JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
