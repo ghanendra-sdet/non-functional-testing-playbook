@@ -44,17 +44,23 @@ markets that matter commercially:
   digital-accessibility lawsuits have climbed year over year for a decade straight,
   numbering in the thousands annually, and they don't just target giant retailers —
   regional banks, universities, restaurants, and healthcare providers all get sued
-  routinely. There's no formal US federal statute that says "your website must be
-  WCAG 2.1 AA," but WCAG AA is what courts and settlement agreements consistently cite
-  as the de facto bar, because it's the only widely recognized technical standard to
-  point to.
+  routinely. For private businesses there's still no federal rule that says "your
+  website must be WCAG 2.1 AA," but WCAG AA is what courts and settlement agreements
+  consistently cite as the de facto bar, because it's the only widely recognized
+  technical standard to point to. For **state and local governments**, it's now
+  explicit: the DOJ's 2024 **ADA Title II rule** names WCAG 2.1 AA as the required
+  standard, with compliance dates (extended by one year in April 2026) of April 2027
+  for entities serving 50,000+ people and April 2028 for smaller ones.
 - **European Union — EN 301 549 and the European Accessibility Act.** EN 301 549 is
   the EU's harmonized accessibility standard for ICT products and services, and it
   incorporates WCAG 2.1 Level AA as its core web-content requirement. The European
   Accessibility Act extended mandatory compliance to private-sector consumer products
-  and services — e-commerce, banking, transport ticketing — with enforcement dates
-  that have already passed in most member states as of 2026, meaning nonconformity is
-  no longer a future risk for EU-facing products, it's a present one.
+  and services (e-commerce, banking, transport ticketing) and has applied across the
+  EU since **28 June 2025**, so nonconformity is a present risk for EU-facing products,
+  not a future one. EN 301 549 **V4.1.1**, published in September 2026, moves the web
+  baseline from WCAG 2.1 to **WCAG 2.2** Level AA; until the European Commission cites
+  it in the Official Journal, V3.2.1 (WCAG 2.1 AA) remains the legally recognized
+  baseline, so test to 2.2 now and you're covered either way.
 - **The general trend, regardless of jurisdiction:** accessibility lawsuits and
   regulatory enforcement actions are rising, not leveling off. The financial exposure
   isn't limited to statutory damages either — plaintiffs' lawyers increasingly bundle
@@ -105,6 +111,25 @@ standard that ADA lawsuits, EN 301 549, and virtually every corporate accessibil
 policy ultimately point back to. Knowing its structure well enough to reference it by
 name is a core QA skill for this module, the same way knowing OWASP Top 10 categories
 by name is a core skill for security testing.
+
+### Which version: WCAG 2.1 or 2.2?
+
+**WCAG 2.2** became a W3C Recommendation in October 2023 and is the current version.
+It's backward compatible: a page that meets 2.2 AA also meets 2.1 AA. Most laws still
+*cite* 2.1 AA (the US Title II rule, EN 301 549 V3.2.1), but the EU's V4.1.1 update
+moves to 2.2, so **test to 2.2 AA** and treat 2.1 as the legal floor. The six new
+Level A/AA criteria in 2.2 are where teams that "already passed 2.1" most often fail:
+
+| Criterion | Level | What to test |
+|---|---|---|
+| **2.4.11** Focus Not Obscured (Minimum) | AA | Tab through the page: a sticky header, cookie banner, or chat widget must never fully cover the focused element |
+| **2.5.7** Dragging Movements | AA | Every drag action (sliders, reorderable lists, map panning) has a single-pointer alternative, such as buttons or tap-to-select |
+| **2.5.8** Target Size (Minimum) | AA | Interactive targets are at least 24×24 CSS px, or have enough spacing; tiny icon buttons and tightly packed links fail |
+| **3.2.6** Consistent Help | A | Help options (contact link, chat, FAQ) appear in the same relative place on every page that has them |
+| **3.3.7** Redundant Entry | A | Information already entered in the same flow (e.g. shipping address) is auto-filled or selectable, not re-typed |
+| **3.3.8** Accessible Authentication (Minimum) | AA | Login doesn't require a cognitive test (memorizing, transcribing, puzzle CAPTCHAs) unless an alternative exists; password managers and paste must work |
+
+2.2 also removed **4.1.1 Parsing** as obsolete, so don't log defects against it.
 
 ### The four principles — POUR
 
@@ -486,6 +511,17 @@ graph TD
     K --> M[Score severity by user impact: users affected x how completely blocked x how core the task]
     L --> N[Prioritized fix list]
     M --> N
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,E,H decision
+    class C,D,G,J,K,L,M step
+    class F,I bad
+    class N good
 ```
 
 The reason automated runs first, not last, is purely efficiency — no point spending
@@ -525,9 +561,13 @@ flow instead of stopping at the first trap.
 
 - Accessibility testing is legally non-optional in most commercial markets: **ADA
   Title III** lawsuits in the US have climbed for a decade and now number in the
-  thousands annually; the EU's **EN 301 549**, built on WCAG 2.1 AA, backs the
-  European Accessibility Act, with enforcement dates already passed in most member
-  states as of 2026.
+  thousands annually, and the Title II rule makes WCAG 2.1 AA explicit for US state
+  and local government sites; the **European Accessibility Act** has applied since
+  28 June 2025, backed by **EN 301 549** (V3.2.1 = WCAG 2.1 AA; V4.1.1, published
+  September 2026, moves to WCAG 2.2 AA).
+- **WCAG 2.2** (W3C Recommendation, October 2023) is the current version: it adds six
+  A/AA criteria on top of 2.1 (focus not obscured, dragging alternatives, 24×24px
+  target size, consistent help, redundant entry, accessible authentication).
 - **WCAG** is organized around four principles — **POUR**: Perceivable, Operable,
   Understandable, Robust — and three conformance levels, **A / AA / AAA**, with
   **AA** the de facto legal and industry standard almost every real project is held to.

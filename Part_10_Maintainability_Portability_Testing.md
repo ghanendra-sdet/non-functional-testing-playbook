@@ -323,6 +323,17 @@ graph TD
     C -->|Config change only| PASS[Portable]
     C -->|Code change required| PARTIAL[Partially Portable]
     C -->|Architecture rework required| FAIL[Not Portable]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A1,A2,A3 start
+    class B1,B2,B3 step
+    class C,PARTIAL decision
+    class PASS good
+    class FAIL bad
 ```
 
 Building this matrix for real doesn't require actually performing three cloud

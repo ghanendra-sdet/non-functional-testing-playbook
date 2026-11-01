@@ -435,9 +435,9 @@ scalability scenarios specifically.
 
 | Tool | Scripting | Best Fit | Notes for Spike/Soak/Scalability Work |
 |---|---|---|---|
-| **k6** | JavaScript | Developer-friendly load/spike/scalability testing, strong CI/CD integration | Built-in `stages` config makes spike profiles (flat → vertical jump → flat) and scalability re-runs at different VU counts trivial to script and version-control |
+| **k6** | JavaScript / TypeScript | Developer-friendly load/spike/scalability testing, strong CI/CD integration | Built-in `stages` config makes spike profiles (flat → vertical jump → flat) and scalability re-runs at different VU counts trivial to script and version-control |
 | **Apache JMeter** | GUI + XML (Groovy for scripting) | Enterprise-standard, huge plugin ecosystem, strong for long-duration soak runs | The long-standing default for multi-hour soak tests in enterprise environments (as seen in both fintech load reports referenced in this part); heavier resource footprint on the load-generator machine itself over very long runs |
-| **Gatling** | Scala DSL | High-throughput scenarios, detailed HTML reports out of the box | Async, non-blocking engine handles very high concurrent-user spike simulations efficiently with a comparatively small load-generator footprint |
+| **Gatling** | Java, Kotlin, Scala, or JS/TS SDK | High-throughput scenarios, detailed HTML reports out of the box | Async, non-blocking engine handles very high concurrent-user spike simulations efficiently with a comparatively small load-generator footprint |
 | **Locust** | Python | Teams that want load-testing logic as plain Python code, distributed load generation | Easiest to hand to a team already comfortable in Python; distributed workers make it straightforward to generate genuinely large-scale spike traffic across multiple machines |
 
 For soak testing specifically, tool choice matters less than **test-runner discipline**: a

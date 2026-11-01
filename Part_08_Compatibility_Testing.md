@@ -106,7 +106,7 @@ different fixes:
 |---|---|---|
 | **BrowserStack** | Real-device and real-browser cloud testing | Runs on actual browser binaries and real mobile devices, not simulators — the gold standard when a bug is suspected to be genuinely device-specific |
 | **Sauce Labs** | Same category as BrowserStack | Strong CI/CD integration, parallel test execution at scale, widely used for automated cross-browser regression suites |
-| **Playwright** | Automated multi-browser testing, built in | Ships with Chromium, Firefox, and WebKit engines out of the box — a single test spec can run against all three with a config change, no separate driver installs. This is directly relevant to this account's own automation stack, where the same Playwright suite can be pointed at all three engines in CI without maintaining three separate test codebases |
+| **Playwright** | Automated multi-browser testing, built in | Ships with Chromium, Firefox, and WebKit engines out of the box — a single test spec can run against all three with a config change, no separate driver installs. In practice, one Playwright suite can be pointed at all three engines in CI without maintaining three separate test codebases |
 
 The practical workflow most teams land on: use Playwright's multi-browser runs (or an
 equivalent) for fast, automated regression coverage of the core flows on every commit,
@@ -372,6 +372,16 @@ graph TD
     D --> F[Manual spot-check before major releases<br/>targeted, not exhaustive]
     E --> G[Compatibility test matrix maintained,<br/>revisited each time analytics shift]
     F --> G
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B decision
+    class C,D,E,F step
+    class G good
 ```
 
 The matrix isn't a one-time artifact either — analytics shift. A browser that was 12% of
@@ -420,7 +430,7 @@ traffic.
   caniuse.com before shipping).
 - Real tools: **BrowserStack** and **Sauce Labs** for real-device/real-browser cloud
   testing; **Playwright** ships Chromium, Firefox, and WebKit built in — one spec, three
-  engines, no extra driver setup, directly relevant to this account's automation stack.
+  engines, no extra driver setup.
 - Responsive testing needs three checks, not one: **viewport breakpoints** (test the
   boundary, not just "does it look fine somewhere"), **touch vs. mouse** (hover-only UI
   is unreachable on touch devices; touch targets need real finger-sized hit areas), and

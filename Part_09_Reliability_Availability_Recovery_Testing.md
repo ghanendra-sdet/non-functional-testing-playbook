@@ -617,7 +617,7 @@ Putting the previous sections into a practical test approach:
 
 On tooling: reliability and DR testing lean less on a single dedicated tool category (the
 way performance testing leans on k6/JMeter/Gatling or security testing leans on Burp
-Suite/OWASP ZAP) and more on infrastructure-level fault injection combined with
+Suite/ZAP) and more on infrastructure-level fault injection combined with
 observability. Kubernetes-native chaos tools, cloud-provider fault injection services,
 and simple network-level fault simulation (blocking a port, adding artificial latency)
 are the common building blocks — Part 13 covers this tooling landscape in depth once

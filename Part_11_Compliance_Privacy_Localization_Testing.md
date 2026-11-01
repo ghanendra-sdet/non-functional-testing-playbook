@@ -180,8 +180,7 @@ and testing consent management means testing all four of those properties, not j
   consent wasn't freely given.
 - **Revocable, and revocation actually stops data flow**: this is the single highest-
   value test in consent management, and it deserves a fully narrated example, because
-  a real defect in exactly this area is one of the best-documented compliance bugs in
-  this account's portfolio of projects.
+  real defects in exactly this area are common, quiet, and expensive.
 
 Consider a consent-governed data-sharing flow: a user links their bank account, a
 lending app requests read access to three months of transaction history, the user
@@ -330,7 +329,13 @@ compliance audit — each access surface is a distinct test target.
 
 PCI-DSS (Payment Card Industry Data Security Standard) governs anyone who stores,
 processes, or transmits cardholder data — card numbers (PAN), expiry dates, CVVs, and
-cardholder names in that context.
+cardholder names in that context. The current version is **PCI DSS v4.0.1**, and every
+requirement that v4.0 introduced as "future-dated" has been mandatory since **31 March
+2025**. Two of those are directly testable by QA: **6.4.3** (every script on the
+payment page is authorized, integrity-checked, and inventoried) and **11.6.1**
+(unauthorized changes to the payment page's scripts and security headers get
+detected). A test for both: inject an unlisted script into the checkout page in a
+staging build and confirm the change-detection mechanism raises an alert.
 
 ### Cardholder Data Environment (CDE) Scoping
 
@@ -353,8 +358,9 @@ The test: submit a payment through every entry point the system exposes (UI, API
 webhook, batch import if one exists), then grep every log store the transaction could
 have touched — application logs, error logs, third-party logging/monitoring services,
 message queues, even browser console output in dev builds — for the literal card
-number used in the test. PCI-DSS requires the PAN be masked wherever it's displayed or
-logged (typically showing only the first six and last four digits), and a genuinely
+number used in the test. PCI-DSS requires the PAN to be rendered unreadable wherever
+it's stored (and a log file is storage), and masked wherever it's displayed (at most
+the BIN and the last four digits). A genuinely
 useful regression test asserts this automatically on every build: fail the pipeline if
 a 16-digit sequence matching a test card number's pattern shows up anywhere in log
 output. This is cheap to automate and catches a defect class that's otherwise
@@ -642,6 +648,17 @@ flowchart TD
     E1 & E2 --> F[Confirmation Sent to Data Subject]
     F --> G[Audit Log Entry Written<br/>who / what / when / proof of completion]
     G --> H[Regulator-Ready Evidence<br/>retrievable on demand, years later]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,D,D1,D2,D3,D4,E,E1,E2,F,G step
+    class C decision
+    class B2 bad
+    class H good
 ```
 
 > [!CAUTION]

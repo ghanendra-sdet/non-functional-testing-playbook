@@ -83,12 +83,12 @@ checks stay a deliberate manual gate before release.
 | Tier | Cadence | What runs | Why here, not elsewhere |
 |---|---|---|---|
 | **Tier 1 — Every commit / PR** | Seconds to a few minutes | Unit-level perf assertions, SAST + dependency/SCA scan, accessibility linting (axe-core), a 3–5 browser compatibility smoke suite, a lightweight synthetic load smoke test (tens, not thousands, of virtual users) | Fast enough not to block developer flow; catches the majority of regressions at the cheapest possible point in the cost curve |
-| **Tier 2 — Nightly / weekly** | Hours | Full load test at realistic peak volume (Part 2), soak test for memory/connection leaks (Part 3), full OWASP ZAP/Burp dynamic scan, full cross-browser/device compatibility matrix (Part 8), automated chaos experiments against staging (Section 13.3) | Too slow or too resource-intensive for every commit, but still fully automatable — runs unattended overnight and reports findings by morning |
+| **Tier 2 — Nightly / weekly** | Hours | Full load test at realistic peak volume (Part 2), soak test for memory/connection leaks (Part 3), full ZAP/Burp dynamic scan, full cross-browser/device compatibility matrix (Part 8), automated chaos experiments against staging (Section 13.3) | Too slow or too resource-intensive for every commit, but still fully automatable — runs unattended overnight and reports findings by morning |
 | **Tier 3 — Manual pre-release gate** | Once per release | Full manual penetration test (Part 5), manual accessibility pass with an actual screen reader (Part 7), exploratory usability testing with real users (Part 6), a go/no-go review of Tier 1/2 trend data | Needs human judgment, adversarial creativity, or lived disability experience that no automated check replicates — this is the gate the earlier tiers exist to make smaller and less frantic, not to replace |
 | **Tier 4 — Production, continuous** | Always on | APM/observability (Section 13.5), automated chaos experiments in production with blast-radius control, real-user monitoring | Not a "test phase" at all in the traditional sense — this is the discipline that closes the loop back into Tier 1 |
 
 The fintech-collection-engine's automation setup is a small, honest example of Tier 1
-already half-built in a real portfolio project: its Playwright/TypeScript regression
+already half-built: its Playwright/TypeScript regression
 suite is "designed to run headless in Jenkins/GitHub Actions on every merge to main" —
 that's the functional half of Tier 1. The natural next step, and exactly the kind of
 thing this part argues for, is putting its JMeter load profile through the same
@@ -124,7 +124,7 @@ flowchart TD
         direction TB
         T2a[Full load test at peak volume]
         T2b[Soak test — leak detection]
-        T2c[Full DAST scan<br/>OWASP ZAP / Burp]
+        T2c[Full DAST scan<br/>ZAP / Burp]
         T2d[Full compatibility matrix]
         T2e[Automated chaos experiments<br/>vs. staging]
     end
@@ -151,6 +151,16 @@ flowchart TD
     end
 
     T4 -.->|incidents & findings feed the next cycle| Dev
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class Dev start
+    class T1a,T1b,T1c,T1d,T1e,T2a,T2b,T2c,T2d,T2e,G1,G2,G3,P1,P2,P3 step
+    class G4 decision
+    class Merge,Release good
 ```
 
 > [!TIP]
@@ -221,8 +231,8 @@ tools an org uses matter less than the five principles underneath the practice:
 
 ### A chaos experiment worth running: what happens when the AI Dispute Resolution Engine's data source goes down?
 
-Here's a scenario built from a real architecture in this account's own portfolio,
-narrated as the chaos experiment it deserves to be.
+Here's a scenario built from a real architecture, narrated as the chaos experiment it
+deserves to be.
 
 The AI Dispute Resolution Engine is a shared AI operations layer sitting across six
 connected fintech products — Collection, Payout, Connected Banking, BBPS, Reseller,

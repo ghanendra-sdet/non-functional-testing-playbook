@@ -117,7 +117,7 @@ function initRouting() {
 }
 
 function handleRoute() {
-  const hash = window.location.hash; // e.g. #Part_01_Software_Testing_Fundamentals.md#11-what-is-testing
+  const hash = window.location.hash; // e.g. #Part_01_NFT_Fundamentals_ISO25010.md#14-the-isoiec-25010-quality-model
   
   if (!hash || hash === '#') {
     loadPage('00_Table_of_Contents.md');
@@ -141,15 +141,15 @@ function handleRoute() {
 // 3. MARKDOWN RENDERING PIPELINE
 const renderer = new marked.Renderer();
 
-// Custom slugify to match standard heading ID conversions
+// GitHub-compatible slugify, so in-page links written for github.com resolve here too.
+// GitHub does NOT collapse repeated dashes or strip leading ones: "A — B" -> "a--b",
+// "📌 Fact Sheet" -> "-fact-sheet".
 function slugify(text) {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '') // remove non-alphanumeric except dashes/spaces
-    .replace(/[\s_]+/g, '-')  // replace spaces/underscores with dashes
-    .replace(/-+/g, '-')      // remove multiple dashes
-    .replace(/^-+|-+$/g, ''); // strip leading/trailing dashes
+    .replace(/[^\w\s-]/g, '') // remove punctuation/emoji except dashes, spaces, underscores
+    .replace(/\s/g, '-');     // each whitespace char becomes one dash
 }
 
 // Custom heading generator to enforce precise slugify ID naming
@@ -270,6 +270,17 @@ async function renderMermaid() {
   const mermaidDivs = document.querySelectorAll('#content .mermaid');
   if (mermaidDivs.length === 0) return;
   
+  // Mermaid skips elements already marked data-processed, so a theme toggle would leave
+  // the old-theme SVG in place. Keep each diagram's source and restore it before re-running.
+  mermaidDivs.forEach(div => {
+    if (div.dataset.source === undefined) {
+      div.dataset.source = div.innerHTML;
+    } else {
+      div.innerHTML = div.dataset.source;
+      div.removeAttribute('data-processed');
+    }
+  });
+
   try {
     const isDark = document.documentElement.classList.contains('dark');
     // Clear and reset mermaid to apply dark/light styling correctly
@@ -337,13 +348,8 @@ async function loadPage(filename, targetSection = null) {
     }
   }
 
-  // Intercept and rewrite markdown links to handle hash-based client-side routing
-  // E.g. [Link](Part_02_Types_of_Testing.md) -> [Link](#Part_02_Types_of_Testing.md)
-  // Also handles [Link](Part_02_Types_of_Testing.md#target) -> [Link](#Part_02_Types_of_Testing.md#target)
-  let cleanMarkdown = markdownText;
-  
-  // Parse and render
-  let html = marked.parse(cleanMarkdown);
+  // Parse and render. Relative .md links are routed by the document click handler below.
+  let html = marked.parse(markdownText);
   html = processAlerts(html);
   html = wrapTables(html);
   
@@ -396,7 +402,7 @@ document.addEventListener('click', e => {
   if (link) {
     const href = link.getAttribute('href');
     if (href && !href.startsWith('http')) {
-      // Clean leading hash to check if it's a page route (e.g. '#Part_01_Software_Testing_Fundamentals.md' or 'Part_01_Software_Testing_Fundamentals.md')
+      // Clean leading hash to check if it's a page route (e.g. '#Part_04_Security_Testing_Fundamentals_OWASP.md' or 'Part_04_Security_Testing_Fundamentals_OWASP.md')
       const cleanHref = href.startsWith('#') ? href.substring(1) : href;
       const mdMatch = cleanHref.match(/^([^#]+\.md)(#.*)?$/);
       
@@ -598,7 +604,7 @@ async function lazyPreloadAndIndex() {
         try {
           const res = await fetch(file);
           if (res.ok) {
-            const text = await res.ok ? await res.text() : '';
+            const text = await res.text();
             fileCache[file] = text;
             indexMarkdownFile(file, text);
           }
@@ -721,8 +727,8 @@ function performSearch(query) {
       <div class="search-tips">
         <strong>Tips:</strong>
         <ul>
-          <li>Press <kbd>Enter</kbd> to search</li>
-          <li>Search for specific templates (e.g. <code>RTM</code>, <code>IEEE 829</code>, <code>Bug Report</code>)</li>
+          <li>Results update as you type</li>
+          <li>Search for specific topics (e.g. <code>OWASP</code>, <code>WCAG</code>, <code>p95</code>, <code>RTO</code>)</li>
           <li>Search for interview questions by typing <code>Interview</code></li>
         </ul>
       </div>
@@ -759,7 +765,7 @@ function performSearch(query) {
   if (results.length === 0) {
     searchResultsContainer.innerHTML = `<div class="search-empty-state">
       <p>No results found for "${escapeHtml(query)}"</p>
-      <span style="font-size: 0.875rem;">Try refining your query terms or searching for acronyms (e.g., STLC, UAT, RTM).</span>
+      <span style="font-size: 0.875rem;">Try refining your query terms or searching for acronyms (e.g., SAST, MTTR, WCAG).</span>
     </div>`;
     return;
   }
@@ -789,7 +795,7 @@ function performSearch(query) {
     }
     
     // Highlight matching tokens
-    const highlightedHeading = s.heading.replace(searchRegex, (m) => `<mark>${escapeHtml(m)}</mark>`);
+    const highlightedHeading = escapeHtml(s.heading).replace(searchRegex, (m) => `<mark>${m}</mark>`);
     const highlightedSnippet = escapeHtml(snippet).replace(searchRegex, (m) => `<mark>${m}</mark>`);
     
     item.innerHTML = `

@@ -46,7 +46,7 @@ you'll come back to most on a real project.
 | Part | Title | Key Topics |
 |------|-------|------------|
 | **4** | [Security Testing I — OWASP & Fundamentals](Part_04_Security_Testing_Fundamentals_OWASP.md) | OWASP Top 10, threat modeling, authentication/authorization testing |
-| **5** | [Security Testing II — Pen Testing & DevSecOps](Part_05_Security_Testing_PenTesting_DevSecOps.md) | Penetration testing basics, Burp Suite vs. OWASP ZAP, shift-left security, CI/CD integration |
+| **5** | [Security Testing II — Pen Testing & DevSecOps](Part_05_Security_Testing_PenTesting_DevSecOps.md) | Penetration testing basics, Burp Suite vs. ZAP, shift-left security, CI/CD integration |
 
 ### User-Facing Quality
 
@@ -78,11 +78,11 @@ you'll come back to most on a real project.
 Other free, open-source courses built the same way — real examples, not textbook
 filler:
 
-- **[Manual Testing Playbook](https://ghanendra-sdet.github.io/manual-testing-playbook/)** — the sister course to this one, covering the full manual-testing discipline
-- **[SDET Roadmap](https://ghanendra-sdet.github.io/sdet-roadmap/)** — QA-to-SDET transformation path
-- **[GIT Tutorials](https://ghanendra-sdet.github.io/git-tutorials/)** — Git + GitHub from scratch
-- **[Java Roadmap](https://ghanendra-sdet.github.io/java-roadmap/)** — Java practice bootcamp with 1,080+ problems
-- **[Automation Playground](https://ghanendra-sdet.github.io/automation-playground/)** — free UI automation practice sandbox
+- **<a href="https://ghanendra-sdet.github.io/manual-testing-playbook/" target="_blank" rel="noopener noreferrer">Manual Testing Playbook</a>** — the sister course to this one, covering the full manual-testing discipline
+- **<a href="https://ghanendra-sdet.github.io/sdet-roadmap/" target="_blank" rel="noopener noreferrer">SDET Roadmap</a>** — QA-to-SDET transformation path
+- **<a href="https://ghanendra-sdet.github.io/git-tutorials/" target="_blank" rel="noopener noreferrer">GIT Tutorials</a>** — Git + GitHub from scratch
+- **<a href="https://ghanendra-sdet.github.io/java-roadmap/" target="_blank" rel="noopener noreferrer">Java Roadmap</a>** — Java practice bootcamp with 1,080+ problems
+- **<a href="https://ghanendra-sdet.github.io/automation-playground/" target="_blank" rel="noopener noreferrer">Automation Playground</a>** — free UI automation practice sandbox
 
 ---
 

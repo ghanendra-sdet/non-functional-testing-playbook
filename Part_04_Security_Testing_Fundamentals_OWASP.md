@@ -9,7 +9,7 @@
 
 1. [Why Security Testing Is Different From Every Other NFT Category](#41-why-security-testing-is-different-from-every-other-nft-category)
 2. [The CIA Triad — The Foundation Everything Else Builds On](#42-the-cia-triad--the-foundation-everything-else-builds-on)
-3. [The OWASP Top 10 (2021) — The Standard Reference](#43-the-owasp-top-10-2021--the-standard-reference)
+3. [The OWASP Top 10 (2025) — The Standard Reference](#43-the-owasp-top-10-2025--the-standard-reference)
 4. [Authentication Testing](#44-authentication-testing)
 5. [Authorization Testing](#45-authorization-testing)
 6. [Input Validation & Injection Testing Fundamentals](#46-input-validation--injection-testing-fundamentals)
@@ -54,8 +54,8 @@ In 2017, Equifax — a credit bureau holding financial data on roughly 147 milli
 people — was breached through a known, publicly disclosed vulnerability in Apache
 Struts that had a patch available for **over two months** before the breach began.
 Nobody needed to discover a zero-day. The attacker just needed the org to be slow
-patching a known issue, which is exactly the kind of gap a **Vulnerable and Outdated
-Components** check (Section 4.3.6 below) is designed to catch before an attacker
+patching a known issue, which is exactly the kind of gap a **Software Supply Chain**
+check (Section 4.3.3 below) is designed to catch before an attacker
 finds it first. The breach exposed Social Security numbers, birth dates, addresses,
 and in some cases driver's license numbers — for a company whose entire business
 model is *being trusted with exactly that data*. It remains one of the clearest
@@ -126,55 +126,158 @@ in Section 4.5 using a consent-based banking platform as the concrete example.
 
 ---
 
-## 4.3 The OWASP Top 10 (2021) — The Standard Reference
+## 4.3 The OWASP Top 10 (2025) — The Standard Reference
 
-The **OWASP Top 10** is a community-driven ranking, published by the Open Web
-Application Security Project, of the most critical web application security risks —
-built from real vulnerability data contributed by security firms and bug bounty
-programs, not opinion. The 2021 revision is still, as of 2026, the current and
-industry-standard version — it hasn't been superseded, and it's the version referenced
-in interviews, security tooling, and compliance frameworks alike. You do not need to
-be a penetration tester to use it. You need to know what each category means well
-enough to design test cases that probe for it, and to recognize the shape of each one
-when you see it in a requirement or a code review.
+The **OWASP Top 10** is a community-driven ranking, published by the Open Worldwide
+Application Security Project, of the most critical web application security risks.
+It's built from real vulnerability data contributed by security firms and bug bounty
+programs, not opinion. The current edition is **OWASP Top 10:2025**, the eighth
+installment, which replaced the 2021 list. Interviews, scanners, and compliance
+checklists still cite 2021 numbering often enough that you should recognize both, so
+the mapping is called out under each category below. You do not need to be a
+penetration tester to use it. You need to know what each category means well enough
+to design test cases that probe for it, and to recognize its shape when you see it in
+a requirement or a code review.
 
 ```mermaid
 graph TD
-    OWASP[OWASP Top 10 — 2021] --> A01[A01: Broken Access Control]
-    OWASP --> A02[A02: Cryptographic Failures]
-    OWASP --> A03[A03: Injection]
-    OWASP --> A04[A04: Insecure Design]
-    OWASP --> A05[A05: Security Misconfiguration]
-    OWASP --> A06[A06: Vulnerable & Outdated Components]
-    OWASP --> A07[A07: Identification & Authentication Failures]
-    OWASP --> A08[A08: Software & Data Integrity Failures]
-    OWASP --> A09[A09: Security Logging & Monitoring Failures]
-    OWASP --> A10[A10: Server-Side Request Forgery]
+    OWASP[🛡️ OWASP Top 10 — 2025] --> A01[A01: Broken Access Control<br/>now includes SSRF]
+    OWASP --> A02[A02: Security Misconfiguration]
+    OWASP --> A03[A03: Software Supply Chain Failures 🆕]
+    OWASP --> A04[A04: Cryptographic Failures]
+    OWASP --> A05[A05: Injection]
+    OWASP --> A06[A06: Insecure Design]
+    OWASP --> A07[A07: Authentication Failures]
+    OWASP --> A08[A08: Software or Data Integrity Failures]
+    OWASP --> A09[A09: Security Logging & Alerting Failures]
+    OWASP --> A10[A10: Mishandling of Exceptional Conditions 🆕]
+
+    classDef root fill:#1e3a8a,stroke:#1e3a8a,color:#ffffff
+    classDef newcat fill:#fde68a,stroke:#b45309,color:#78350f
+    classDef cat fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    class OWASP root
+    class A03,A10 newcat
+    class A01,A02,A04,A05,A06,A07,A08,A09 cat
 ```
+
+**What changed from 2021**, in one table:
+
+| 2025 | Change from 2021 |
+|---|---|
+| A01 Broken Access Control | Still #1; **SSRF (A10:2021) folded in** |
+| A02 Security Misconfiguration | Up from #5 |
+| A03 Software Supply Chain Failures | **New** — widens A06:2021 Vulnerable & Outdated Components to build systems and distribution |
+| A04 Cryptographic Failures | Down from #2 |
+| A05 Injection | Down from #3 |
+| A06 Insecure Design | Down from #4 |
+| A07 Authentication Failures | Renamed from "Identification and Authentication Failures" |
+| A08 Software or Data Integrity Failures | Same position |
+| A09 Security Logging & Alerting Failures | Renamed from "…Monitoring Failures" — alerting has to follow logging |
+| A10 Mishandling of Exceptional Conditions | **New** — error handling, logic errors, failing open |
 
 ### 4.3.1 A01 — Broken Access Control
 
-The single most common category in the 2021 list, and consistently one of the most
-severe. It covers any situation where the system fails to properly enforce **what an
-authenticated user is and isn't allowed to do** — as opposed to authentication
-failures (A07), which are about proving *who* someone is in the first place. Access
-control failures happen *after* login: the user is legitimately who they say they are,
-but the system lets them act outside their intended permissions anyway.
+The most common category in both the 2021 and 2025 lists, and consistently one of the
+most severe. It covers any situation where the system fails to properly enforce **what
+an authenticated user is and isn't allowed to do**. Authentication failures (A07) are
+about proving *who* someone is; access control failures happen *after* login. The user
+is legitimately who they say they are, but the system lets them act outside their
+intended permissions anyway.
 
 **Concrete testable scenario:** A merchant dashboard exposes an endpoint
 `GET /api/merchant/{merchantId}/transactions`. A logged-in merchant with ID `4471`
 edits the URL (or the request body, or an API call replayed through Burp Suite) to
-`merchantId=4472` — a different merchant's ID — and the endpoint returns that other
+`merchantId=4472`, a different merchant's ID, and the endpoint returns that other
 merchant's transaction history anyway, because the backend trusted the ID in the
 request instead of deriving it from the authenticated session. This is the most common
-concrete shape Broken Access Control takes in practice, and it has a name of its own —
-**IDOR (Insecure Direct Object Reference)** — which gets a full worked example, using
-this account's own consent-based banking platform, in Section 4.5.
+concrete shape Broken Access Control takes in practice, and it has a name of its own,
+**IDOR (Insecure Direct Object Reference)**, which gets a full worked example using a
+consent-based banking platform in Section 4.5.
 
-### 4.3.2 A02 — Cryptographic Failures
+#### Server-Side Request Forgery (SSRF), now part of A01
 
-Previously called "Sensitive Data Exposure" in the 2017 list — renamed in 2021 to
-correctly point at the *root cause* rather than the symptom. This category covers
+SSRF had its own slot (A10) in 2021. The 2025 list folds it into Broken Access Control,
+which is a fair reading of what it is: the server is tricked into reaching a
+destination the user was never allowed to reach. It occurs when an application fetches
+a remote resource using a URL supplied (directly or indirectly) by the user, without
+validating or restricting where that URL can point. The *server* typically has network
+access the attacker doesn't, including to internal-only services, and the attacker
+borrows it.
+
+**Concrete testable scenario:** a "webhook URL" configuration field lets a merchant
+specify where payment status callbacks should be sent. A tester sets it to
+`http://169.254.169.254/latest/meta-data/`, the address cloud providers use for
+internal instance metadata (often containing credentials), instead of a real webhook
+endpoint. If the server fetches that internal address and reflects the response back
+anywhere the attacker can see it, that's a working SSRF: the attacker just used the
+trusted server as a proxy into a network segment they could never reach directly.
+
+> [!CAUTION]
+> **🎭 Meme Break — Expanding Brain**
+>
+> 🧠 *Level 1: "We validate the webhook URL is a valid URL format."*  
+> 🧠🧠 *Level 2: "We validate it's HTTPS."*  
+> 🧠🧠🧠 *Level 3: "We block URLs pointing at private/internal IP ranges."*  
+> 🧠🧠🧠🧠 *Level 4: We maintain an allowlist of destinations the server is permitted
+> to call at all, because "block the obviously bad ones" is a losing game against
+> DNS rebinding and redirect tricks. SSRF defenses that only blocklist known-bad
+> addresses get bypassed constantly.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> A tester finds that a "profile picture URL" field will fetch and display whatever image URL a user submits. Why is this worth testing as a potential SSRF, not just a feature check?</summary>
+
+Because "fetch a URL the user supplied" is the exact mechanism SSRF exploits. The
+server, not the attacker's own machine, makes the request, and the server may have
+network access (to internal admin panels, cloud metadata endpoints, other internal
+services) the attacker doesn't have directly. The test isn't "does a valid image URL
+work." It's "what happens if I point this at an internal address, a non-image
+endpoint, or a redirect chain that ends somewhere internal." A feature that looks
+purely cosmetic can be a live SSRF vector if the fetch logic doesn't restrict
+destinations.
+
+</details>
+
+### 4.3.2 A02 — Security Misconfiguration
+
+Up from #5 in 2021. The most common root cause here is *inherited defaults nobody
+changed*: default admin credentials left active, verbose error messages that leak
+stack traces and internal file paths to end users, directory listing left enabled on a
+production server, unnecessary services or ports left open, cloud storage buckets left
+publicly readable, or overly permissive CORS headers that let any origin call an API
+meant for one trusted frontend.
+
+**Concrete testable scenario:** a tester deliberately submits a malformed request to
+a production API and gets back a full stack trace revealing the internal framework
+version, the file path of the handler, and a fragment of a SQL query. That costs an
+attacker nothing to obtain and hands them a head start on the kind of injection
+probing described in A05. A misconfigured error-handling setting (detailed errors in
+production instead of a generic message) turned a harmless test request into free
+reconnaissance.
+
+### 4.3.3 A03 — Software Supply Chain Failures
+
+New in 2025. It widens 2021's "Vulnerable and Outdated Components" from *the libraries
+you import* to *everything that builds and ships your software*: dependencies and
+transitive dependencies, container base images, build tools, CI/CD runners, package
+registries, and the distribution channel itself. Every one of those is code you didn't
+write and are nonetheless responsible for. The old core of the category is exactly
+what let the Equifax breach happen (Section 4.1): a component with a known, publicly
+disclosed, patched vulnerability was left unpatched.
+
+**Concrete testable scenario:** a QA engineer runs `npm audit` (or the equivalent for
+the stack in use) against the project's dependency tree as part of a pre-release
+checklist and finds a transitive dependency three levels deep with a published
+critical CVE and an available patched version. This is not exotic penetration
+testing. It's a five-minute command that a huge share of teams never run on a
+schedule, which is exactly the gap that turned a routine Apache Struts CVE into one
+of the largest data breaches in history. The 2025 framing adds a second check worth
+writing into the same checklist: are dependency versions pinned with a lockfile, and
+does the pipeline pull from a trusted registry rather than whatever resolves first?
+
+### 4.3.4 A04 — Cryptographic Failures
+
+Called "Sensitive Data Exposure" in the 2017 list and renamed in 2021 to point at the
+*root cause* rather than the symptom; down from #2 to #4 in 2025. This category covers
 data that should be protected by encryption but isn't, or is protected with broken,
 outdated, or misapplied cryptography: passwords stored in plaintext or with a weak
 hash (MD5, unsalted SHA-1), sensitive data sent over plain HTTP instead of TLS,
@@ -182,21 +285,20 @@ hardcoded encryption keys checked into source control, or a homegrown encryption
 scheme instead of a vetted standard algorithm.
 
 **Concrete testable scenario:** picture a UPI payment dashboard whose encryption
-design uses **AES-256-GCM** — a strong, industry-standard algorithm — to encrypt every
+design uses **AES-256-GCM**, a strong, industry-standard algorithm, to encrypt every
 payload before it leaves the browser, deriving the AES key by SHA-256-hashing each
-merchant's Secret Key. That's a genuinely solid design on paper. But now picture the
-same Secret Key serving **two jobs at once**: it authenticates the merchant to the
-token endpoint *and* it's the key material for the payload encryption. A tester's job
-here isn't to attack the AES-GCM math — that's a settled, vetted algorithm and not
-where the risk lives. The risk lives in the **key management**: what happens if that
-Secret Key is regenerated on one side but not updated on the other? What happens if
-it ends up logged somewhere, or — worse — hardcoded directly into a README or a config
-file committed to source control, which is a mistake so common it has its own line
-item in nearly every real-world breach post-mortem? A strong algorithm wrapped around
-a leaked or mismanaged key provides exactly zero protection. This is precisely why
-Cryptographic Failures testing is less about "is the algorithm strong" and almost
-entirely about "is the key handled safely everywhere it exists" — in transit, at rest,
-in logs, and in version control.
+merchant's Secret Key. That's a solid design on paper. Now picture the same Secret Key
+serving **two jobs at once**: it authenticates the merchant to the token endpoint *and*
+it's the key material for the payload encryption. A tester's job here isn't to attack
+the AES-GCM math; that's a settled, vetted algorithm and not where the risk lives. The
+risk lives in the **key management**. What happens if that Secret Key is regenerated on
+one side but not updated on the other? What if it ends up logged somewhere, or
+hardcoded directly into a README or a config file committed to source control? That
+mistake is common enough to show up in nearly every real-world breach post-mortem. A
+strong algorithm wrapped around a leaked or mismanaged key provides zero protection,
+which is why Cryptographic Failures testing is less about "is the algorithm strong" and
+almost entirely about "is the key handled safely everywhere it exists": in transit, at
+rest, in logs, and in version control.
 
 > [!TIP]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -209,7 +311,7 @@ in logs, and in version control.
 <details>
 <summary>🧠 <strong>Quick Check:</strong> A payment dashboard uses AES-256-GCM to encrypt every payload — a strong, well-vetted algorithm. Why might a security tester still flag it as high-risk?</summary>
 
-Because algorithm strength is only half the story — the other half is key management.
+Because algorithm strength is only half the story; the other half is key management.
 If the same secret key is used both to authenticate to an API and to derive the
 encryption key, a leak of that one value compromises both authentication and
 confidentiality simultaneously. A tester should check where that key lives: is it ever
@@ -220,169 +322,125 @@ Failure regardless of how strong the algorithm is.
 
 </details>
 
-### 4.3.3 A03 — Injection
+### 4.3.5 A05 — Injection
 
 Any flaw where untrusted input is interpreted as a *command* rather than *data* by an
-interpreter — SQL, NoSQL, OS shell, LDAP, or an ORM query built by string
-concatenation. Covered in full technical depth in Section 4.6, but the category
-definition matters here: injection is fundamentally a **trust boundary failure** — the
+interpreter: SQL, NoSQL, OS shell, LDAP, or an ORM query built by string
+concatenation. Section 4.6 covers it in full technical depth, but the category
+definition matters here. Injection is fundamentally a **trust boundary failure**: the
 system trusted that user input would only ever contain data, and an attacker proved
-that assumption wrong.
+that assumption wrong. It slipped from #3 to #5 in 2025 as frameworks made
+parameterized queries the default, but it's still one of the first things to probe on
+any input field.
 
 **Concrete testable scenario:** a "search transactions by reference number" field
 builds its query as `"SELECT * FROM transactions WHERE ref_no = '" + userInput + "'"`.
 A tester enters `' OR '1'='1` as the reference number. If the query executes and
 returns *every* transaction in the table instead of erroring or returning nothing,
-the field is injectable — and depending on database permissions, the same flaw could
-just as easily be used to modify or delete data, not just read it.
+the field is injectable, and depending on database permissions the same flaw could be
+used to modify or delete data, not just read it.
 
-### 4.3.4 A04 — Insecure Design
+### 4.3.6 A06 — Insecure Design
 
-New to the 2021 list, and deliberately distinct from A05 (Security Misconfiguration).
-Misconfiguration is "the design was fine, the setup was wrong." **Insecure Design**
-is "the design itself never accounted for the threat" — no amount of careful
-configuration or bug-fixing saves an architecture that was never threat-modeled in the
-first place. This is why threat modeling (Section 4.7) happens at design time, not
-as a test pass at the end — Insecure Design bugs are usually only fixable by
-re-architecting, which is expensive precisely because nobody asked "what could go
-wrong" early enough.
+Introduced in 2021 and deliberately distinct from Security Misconfiguration (A02).
+Misconfiguration is "the design was fine, the setup was wrong." **Insecure Design** is
+"the design itself never accounted for the threat." No amount of careful configuration
+or bug-fixing saves an architecture that was never threat-modeled. That's why threat
+modeling (Section 4.7) happens at design time rather than as a test pass at the end:
+Insecure Design bugs are usually only fixable by re-architecting, which is expensive
+precisely because nobody asked "what could go wrong" early enough.
 
 **Concrete testable scenario:** a password-reset flow emails a reset link containing
 a sequential, guessable token like `?resetId=88231`. No amount of "securing" the
-email transport fixes this — the *design* assumed the token only needed to be
-hard to stumble onto, not hard to guess deliberately. The fix isn't a patch, it's
-redesigning the token to be a long, cryptographically random, single-use value. A
-tester's job during design review is to ask exactly this kind of "what stops someone
-from just incrementing this" question before the flow ships.
+email transport fixes this. The *design* assumed the token only needed to be hard to
+stumble onto, not hard to guess deliberately. The fix isn't a patch; it's redesigning
+the token to be a long, cryptographically random, single-use value. A tester's job
+during design review is to ask exactly this kind of "what stops someone from just
+incrementing this" question before the flow ships.
 
-### 4.3.5 A05 — Security Misconfiguration
+### 4.3.7 A07 — Authentication Failures
 
-The most common root cause in this category is *inherited defaults nobody changed*:
-default admin credentials left active, verbose error messages that leak stack traces
-and internal file paths to end users, directory listing left enabled on a production
-server, unnecessary services or ports left open, cloud storage buckets left publicly
-readable, or overly permissive CORS headers that let any origin call an API meant
-for one trusted frontend.
+Renamed in 2025 from "Identification and Authentication Failures." Covers any weakness
+in confirming *who* a user is: weak or absent password policies, no protection against
+credential-stuffing or brute-force attempts, session IDs exposed in URLs, sessions that
+never expire, and missing or poorly implemented multi-factor authentication.
+Authentication testing is dense enough to get its own section (4.4) below.
 
-**Concrete testable scenario:** a tester deliberately submits a malformed request to
-a production API and gets back a full stack trace revealing the internal framework
-version, the file path of the handler, and a fragment of a SQL query — information
-that costs an attacker nothing to obtain and hands them a head start on exactly the
-kind of injection probing described in A03. A misconfigured error-handling setting
-(showing detailed errors in production instead of a generic message) turned a
-harmless test request into free reconnaissance.
+### 4.3.8 A08 — Software or Data Integrity Failures
 
-### 4.3.6 A06 — Vulnerable and Outdated Components
-
-Every dependency your application pulls in — libraries, frameworks, the OS, container
-base images — is code you didn't write and are nonetheless responsible for. This
-category is exactly what let the Equifax breach happen (Section 4.1): a component
-with a known, publicly disclosed, patched vulnerability was left unpatched.
-
-**Concrete testable scenario:** a QA engineer runs `npm audit` (or the equivalent for
-the stack in use) against the project's dependency tree as part of a pre-release
-checklist and finds a transitive dependency three levels deep with a published
-critical CVE and an available patched version. This is not exotic penetration
-testing — it's a five-minute command that a huge share of teams simply never run on a
-schedule, which is exactly the gap that turned a routine Apache Struts CVE into one
-of the largest data breaches in history.
-
-### 4.3.7 A07 — Identification and Authentication Failures
-
-Covers any weakness in confirming *who* a user is: weak or absent password policies,
-no protection against credential-stuffing or brute-force attempts, session IDs
-exposed in URLs, sessions that never expire, and missing or poorly implemented
-multi-factor authentication. Gets a full dedicated section (4.4) below because
-authentication testing is dense enough to need one.
-
-### 4.3.8 A08 — Software and Data Integrity Failures
-
-New to the 2021 list, covering integrity assumptions that break down: code or
-infrastructure that relies on plugins, libraries, or CI/CD pipelines from untrusted
-sources without verifying integrity (no checksum or signature validation), and
-**insecure deserialization** — where an application deserializes untrusted data
-without validating it, letting an attacker craft a malicious serialized object that
+Introduced in 2021, and still at #8. It covers integrity assumptions that break down:
+code or infrastructure that relies on plugins, libraries, or CI/CD pipelines from
+untrusted sources without verifying integrity (no checksum or signature validation),
+and **insecure deserialization**, where an application deserializes untrusted data
+without validating it and an attacker crafts a malicious serialized object that
 executes code on deserialization.
 
 **Concrete testable scenario:** picture a reseller platform where commission
-attribution is meant to be **lifetime and tamper-proof** — once a merchant is
-attributed to a reseller, that link should only change via an explicit admin
-reassignment, never silently. Now picture a request payload for an internal
-reconciliation job that includes a `resellerId` field the client can influence,
-because the backend re-derives the attribution from the request instead of from an
-immutable, server-side record every time. If a tester can manipulate that field and
-watch commission attribution shift to a different reseller without any admin action,
-that's a Software and Data Integrity Failure — the system trusted a client-supplied
-value for something that was supposed to be an authoritative, tamper-proof record.
-This is precisely the kind of defect a data-isolation-focused regression suite is
-built to catch, and it's exactly the class of test this account's own reseller
-platform work treats as top priority — ahead of standard functional coverage,
-specifically because a multi-tenant system's biggest risk is never "does the feature
-work," it's "does the feature only ever work *within its own tenant's boundary*."
+attribution is meant to be **lifetime and tamper-proof**. Once a merchant is attributed
+to a reseller, that link should only change via an explicit admin reassignment, never
+silently. Now picture a request payload for an internal reconciliation job that
+includes a `resellerId` field the client can influence, because the backend re-derives
+the attribution from the request instead of from an immutable, server-side record. If a
+tester can manipulate that field and watch commission attribution shift to a different
+reseller without any admin action, that's a Software or Data Integrity Failure: the
+system trusted a client-supplied value for something that was supposed to be an
+authoritative, tamper-proof record. A data-isolation-focused regression suite exists to
+catch exactly this, and on a multi-tenant system it belongs ahead of standard
+functional coverage. The biggest risk there is never "does the feature work." It's
+"does the feature only ever work *within its own tenant's boundary*."
 
 → Reference: <a href="https://github.com/ghanendra-sdet/reseller-management-platform" target="_blank" rel="noopener noreferrer">reseller-management-platform</a>
 
-### 4.3.9 A09 — Security Logging and Monitoring Failures
+### 4.3.9 A09 — Security Logging & Alerting Failures
 
-Ties directly back to the "would we even notice" question from Section 4.1. This
-category covers systems where security-relevant events — failed logins, access-control
-failures, high-value transactions, consent revocations, admin actions — either aren't
-logged at all, are logged without enough detail to investigate later, or are logged
-but nobody's alerting on them. The overwhelming majority of real-world breaches are
-discovered by a third party or months after the fact, not by the victim's own
-monitoring — which is the industry's clearest evidence that this category is
-under-tested relative to how much damage its absence causes.
+Renamed in 2025 from "Security Logging and Monitoring Failures," to stress that a log
+nobody gets alerted on is barely better than no log. It ties directly back to the
+"would we even notice" question from Section 4.1. This category covers systems where
+security-relevant events (failed logins, access-control failures, high-value
+transactions, consent revocations, admin actions) either aren't logged at all, are
+logged without enough detail to investigate later, or are logged with no alert attached.
+Most real-world breaches are discovered by a third party or months after the fact, not
+by the victim's own monitoring, which is the industry's clearest evidence that this
+category is under-tested relative to the damage its absence causes.
 
 **Concrete testable scenario:** a tester intentionally triggers what should be a
-loud, unambiguous security event — say, attempting to fetch a user's data after their
-data-sharing consent has been explicitly revoked — and then checks two things, not
-one: did the fetch get *blocked* (that's Broken Access Control territory), and
-separately, was the *attempt itself logged* with enough detail (who, what, when, and
-that it was denied) for someone to review later? A system that correctly blocks the
-request but logs nothing about the attempt has a Security Logging and Monitoring
-Failure sitting right next to a correctly-working access control — and it's the kind
-of gap that only surfaces when a tester deliberately checks the audit trail instead
-of just checking the response code.
+loud, unambiguous security event (say, fetching a user's data after their
+data-sharing consent has been explicitly revoked) and then checks three things. Did
+the fetch get *blocked*? That's Broken Access Control territory. Was the *attempt
+itself logged* with enough detail (who, what, when, and that it was denied) to review
+later? And did that log line *raise an alert* to someone who'd act on it? A system that
+blocks the request but logs nothing, or logs it into a file no one watches, has an A09
+failure sitting right next to a correctly working access control. It only surfaces
+when a tester deliberately checks the audit trail and the alert channel instead of
+just the response code.
 
-### 4.3.10 A10 — Server-Side Request Forgery (SSRF)
+### 4.3.10 A10 — Mishandling of Exceptional Conditions
 
-Occurs when an application fetches a remote resource using a URL supplied (directly
-or indirectly) by the user, without validating or restricting where that URL can
-point. An attacker abuses this to make the *server* — which typically has network
-access the attacker doesn't, including to internal-only services — issue requests on
-their behalf.
+New in 2025. It covers what a system does when something goes wrong: improper error
+handling, logic errors in edge cases, and above all **failing open**, where an error
+path quietly grants access or approves an action that the happy path would have
+blocked. Functional testing rarely reaches these paths, because they only run when a
+dependency times out, returns garbage, or throws.
 
-**Concrete testable scenario:** a "webhook URL" configuration field lets a merchant
-specify where payment status callbacks should be sent. A tester sets it to
-`http://169.254.169.254/latest/meta-data/` — the address cloud providers use for
-internal instance metadata, often containing credentials — instead of a real webhook
-endpoint. If the server dutifully fetches that internal address and reflects the
-response back anywhere the attacker can see it, that's a working SSRF: the attacker
-just used the trusted server as a proxy into a network segment they could never reach
-directly.
-
-> [!CAUTION]
-> **🎭 Meme Break — Expanding Brain**
->
-> 🧠 *Level 1: "We validate the webhook URL is a valid URL format."*  
-> 🧠🧠 *Level 2: "We validate it's HTTPS."*  
-> 🧠🧠🧠 *Level 3: "We block URLs pointing at private/internal IP ranges."*  
-> 🧠🧠🧠🧠 *Level 4: We maintain an allowlist of destinations the server is permitted
-> to call at all, because "block the obviously bad ones" is a losing game against
-> DNS rebinding and redirect tricks — SSRF defenses that only blocklist known-bad
-> addresses get bypassed constantly.*
+**Concrete testable scenario:** a payout service calls a fraud-scoring API before
+releasing funds. The integration wraps the call in a `try/catch`, and the `catch` block
+logs the error and lets the payout continue, on the reasoning that "we don't want a
+flaky fraud service to block legitimate payouts." A tester uses a mock or a fault
+injection proxy to make the fraud API time out, then submits a payout that the fraud
+service would have rejected. If the money moves, the system fails open: every outage
+of the fraud service is now an open window for exactly the payouts it exists to stop.
+The expected behavior is fail-closed (hold the payout for retry or manual review), and
+the test belongs in the same suite as the happy-path payout tests, not in a separate
+"resilience someday" backlog.
 
 <details>
-<summary>🧠 <strong>Quick Check:</strong> A tester finds that a "profile picture URL" field will fetch and display whatever image URL a user submits. Why is this worth testing as a potential SSRF, not just a feature check?</summary>
+<summary>🧠 <strong>Quick Check:</strong> Why does "Mishandling of Exceptional Conditions" overlap with reliability testing (Part 9), and what makes it a security category anyway?</summary>
 
-Because "fetch a URL the user supplied" is the exact mechanism SSRF exploits — the
-server, not the attacker's own machine, is the one making the request, and the server
-may have network access (to internal admin panels, cloud metadata endpoints, other
-internal services) the attacker doesn't have directly. The test isn't "does a valid
-image URL work" — it's "what happens if I point this at an internal address, a
-non-image endpoint, or a redirect chain that ends somewhere internal." A feature that
-looks purely cosmetic (show my profile picture) can be a live SSRF vector if the
-fetch logic doesn't restrict destinations.
+Both deliberately break dependencies to see what the system does. Reliability testing
+asks "does the system recover and stay available?" A10 asks "while it's failing, does
+it stay *safe*?" A service that stays up during a fraud-API outage by approving
+everything passes a naive availability check and fails the security one. The fault
+injection techniques are shared; the assertion is different.
 
 </details>
 
@@ -685,7 +743,7 @@ mapping to a way an attacker could compromise the system:
 ```mermaid
 flowchart TD
     Start[New feature or flow being designed] --> Draw[Draw the data flow: entities, processes, data stores, trust boundaries]
-    Draw --> Ask{For each trust boundary,\nask STRIDE}
+    Draw --> Ask{For each trust boundary,<br/>ask STRIDE}
     Ask --> S[Spoofing: can identity be faked here?]
     Ask --> T[Tampering: can data be altered here?]
     Ask --> R[Repudiation: is there proof of who did what?]
@@ -701,6 +759,17 @@ flowchart TD
     Rank --> Mitigate[Design mitigation or accept the risk explicitly]
     Mitigate --> Tests[Write concrete test cases for each unmitigated threat]
     Tests --> Ship[Feature ships with security tests already defined]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class Start start
+    class Draw,Rank,Mitigate,Tests step
+    class Ask decision
+    class S,T,R,I,D,E bad
+    class Ship good
 ```
 
 Applying this to a real flow makes it concrete. Take a consent-based Account
@@ -751,17 +820,18 @@ tries to confirm a record *exists and can't be altered* after the fact.
   question is "what's the worst someone could do on purpose, and would we notice?"
 - The **CIA triad** — Confidentiality, Integrity, Availability — is the foundation
   every OWASP category and every STRIDE threat maps back onto.
-- **OWASP Top 10 (2021)** is still the current, standard reference as of 2026:
-  Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security
-  Misconfiguration, Vulnerable & Outdated Components, Identification & Authentication
-  Failures, Software & Data Integrity Failures, Security Logging & Monitoring
-  Failures, and SSRF.
-- **Broken Access Control** is the most common 2021 category — and its most concrete
+- **OWASP Top 10:2025** is the current edition (it replaced 2021): Broken Access
+  Control (now including SSRF), Security Misconfiguration, Software Supply Chain
+  Failures, Cryptographic Failures, Injection, Insecure Design, Authentication
+  Failures, Software or Data Integrity Failures, Security Logging & Alerting Failures,
+  and Mishandling of Exceptional Conditions.
+- **Broken Access Control** is #1 in both 2021 and 2025 — and its most concrete
   everyday shape is **IDOR**: changing an ID in a URL to see or act on someone else's
   data.
 - Equifax's 2017 breach — 147 million people's data exposed via a known,
   **already-patched** Apache Struts vulnerability left unfixed for two months — is the
-  clearest real-world case for why Vulnerable & Outdated Components checks matter.
+  clearest real-world case for why Software Supply Chain (formerly Vulnerable &
+  Outdated Components) checks matter.
 - **Cryptographic Failures are almost always about key management, not algorithm
   strength** — a strong algorithm (AES-256-GCM) wrapped around a leaked, logged, or
   dual-purpose key provides no real protection.

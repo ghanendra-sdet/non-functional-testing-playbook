@@ -371,6 +371,16 @@ flowchart TD
     F --> G[Report findings<br/>severity-ranked, tied to specific heuristics/tasks]
     G --> H[Prioritize fixes<br/>blocking vs. friction vs. polish]
     H -.->|Re-test after fix| A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B decision
+    class C,D,E,F,G step
+    class H good
 ```
 
 The loop back at the end is deliberate: usability testing is not a one-time gate before

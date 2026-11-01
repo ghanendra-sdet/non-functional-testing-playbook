@@ -181,7 +181,7 @@ fail, instead of a feeling.
 ## 12.4 A Tool-Selection Matrix
 
 Parts 2–11 covered the tools in depth: k6, JMeter, Gatling, and Locust for performance;
-Burp Suite and OWASP ZAP for security; axe DevTools and Lighthouse for accessibility;
+Burp Suite and ZAP for security; axe DevTools and Lighthouse for accessibility;
 BrowserStack and Playwright for compatibility. What none of those parts answered is:
 **which one do you actually pick, for this team, on this project, this quarter?**
 
@@ -192,7 +192,7 @@ list. The right question is a small set of team-shaped factors:
 | Factor | What it changes |
 |---|---|
 | **Team size** | A one-person QA function cannot maintain a JMeter GUI test plan alongside manual regression — it needs something scriptable and low-maintenance (k6). A dedicated performance engineering team can justify JMeter or Gatling's steeper learning curve for its richer protocol support and reporting. |
-| **Budget** | Burp Suite Professional and BrowserStack are paid; OWASP ZAP and Playwright's built-in browser matrix are free. A budget-constrained team doesn't get a worse tool by default — ZAP covers OWASP Top 10 fundamentals well — but it does mean deep, automated crawl-based pentesting features stay out of reach without the paid tier. |
+| **Budget** | Burp Suite Professional and BrowserStack are paid; ZAP and Playwright's built-in browser matrix are free. A budget-constrained team doesn't get a worse tool by default — ZAP covers OWASP Top 10 fundamentals well — but it does mean deep, automated crawl-based pentesting features stay out of reach without the paid tier. |
 | **CI/CD maturity** | If nothing runs in a pipeline yet, a GUI-first tool (JMeter, BrowserStack manual sessions) is fine as a starting point. If the team already has GitHub Actions/Jenkins wired up for functional Playwright tests, a code-first tool (k6, ZAP's CLI/baseline scan, axe-core as an npm dependency) slots into the exact same pipeline with far less new tooling to maintain. |
 | **In-house expertise** | A team already writing TypeScript/JavaScript for functional Playwright tests picks up k6 (JS-based scripting) and axe-core (JS library) far faster than a team with zero JS depth would pick up Gatling's Scala DSL. Existing skill is a real, first-class input — not a tie-breaker after "best tool," but often the deciding factor. |
 
@@ -206,7 +206,7 @@ and no dedicated security specialist. Running the matrix:
   specs can write load scripts without learning a new language; scriptable and CLI-first,
   so it drops straight into the existing GitHub Actions pipeline; no GUI test plan file
   to maintain and merge-conflict over, unlike JMeter's XML.
-- **Security:** OWASP ZAP — free, has a baseline scan mode that runs unattended in CI,
+- **Security:** ZAP — free, has a baseline scan mode that runs unattended in CI,
   and covers OWASP Top 10 fundamentals without needing a dedicated pentester on staff;
   Burp Suite stays on the wishlist for the day the team can justify a specialist role
   or an external pentest engagement.
@@ -422,7 +422,7 @@ collection release described in the previous section.
 
 > Performance: k6, scripted against the staging environment provisioned at 80% of
 > production database and compute sizing (see Entry Criteria below — this is a hard
-> gate, not a nice-to-have). Security: OWASP ZAP baseline scan in CI on every merge to
+> gate, not a nice-to-have). Security: ZAP baseline scan in CI on every merge to
 > the feature branch, plus a manual authenticated walkthrough of authorization
 > boundaries. Reliability: custom Playwright-based test harness simulating duplicate/
 > retried requests against the Payment Link confirmation endpoint.
@@ -562,20 +562,31 @@ Pulling every section of this part together into one repeatable process:
 
 ```mermaid
 flowchart TD
-    A[Elicit NFRs\nuser-story questions, SLAs,\npast incident reviews] --> B[Write NFRs as\ntestable statements\nmetric + threshold + conditions]
-    B --> C[Risk-prioritize by\nISO 25010 characteristic\nvs. business risk of the flow]
-    C --> D[Select tools\nteam size, budget,\nCI/CD maturity, expertise]
-    D --> E[Write the\nNon-Functional Test Plan\nscope, NFRs, entry/exit, risk, schedule]
-    E --> F{Entry criteria met?\nrepresentative environment,\nrealistic data, stable functional flow}
-    F -- No --> F1[Block start\nfix environment/data gap first]
+    A[Elicit NFRs<br/>user-story questions, SLAs,<br/>past incident reviews] --> B[Write NFRs as<br/>testable statements<br/>metric + threshold + conditions]
+    B --> C[Risk-prioritize by<br/>ISO 25010 characteristic<br/>vs. business risk of the flow]
+    C --> D[Select tools<br/>team size, budget,<br/>CI/CD maturity, expertise]
+    D --> E[Write the<br/>Non-Functional Test Plan<br/>scope, NFRs, entry/exit, risk, schedule]
+    E --> F{Entry criteria met?<br/>representative environment,<br/>realistic data, stable functional flow}
+    F -- No --> F1[Block start<br/>fix environment/data gap first]
     F1 --> F
-    F -- Yes --> G[Execute\nperformance / security / a11y /\ncompatibility / reliability tests]
-    G --> H[Report against\nexit criteria\nthresholds met? risk accepted\nfor anything open?]
+    F -- Yes --> G[Execute<br/>performance / security / a11y /<br/>compatibility / reliability tests]
+    G --> H[Report against<br/>exit criteria<br/>thresholds met? risk accepted<br/>for anything open?]
     H --> I{Exit criteria met?}
-    I -- No --> J[Fix or explicit\nrisk acceptance]
+    I -- No --> J[Fix or explicit<br/>risk acceptance]
     J --> H
     I -- Yes --> K[Release]
-    K -.->|Production findings\nfeed back as new NFRs| A
+    K -.->|Production findings<br/>feed back as new NFRs| A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,G,H,J step
+    class F,I decision
+    class F1 bad
+    class K good
 ```
 
 This loop is the practical answer to the question this part opened with: not "run

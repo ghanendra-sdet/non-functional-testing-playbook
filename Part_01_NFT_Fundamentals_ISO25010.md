@@ -154,6 +154,14 @@ graph TD
     Q --> SEC[Security]
     Q --> MAIN[Maintainability]
     Q --> PORT[Portability]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class Q start
+    class FS,PE,COMP,USE,REL,SEC,MAIN,PORT step
 ```
 
 ### The 2023 revision — 9 characteristics
@@ -173,6 +181,30 @@ both versions in the wild:
 - **Reliability's core sub-characteristic shifted from "maturity" to
   "faultlessness"** — a subtle but real shift in emphasis toward absence of defects
   over general system maturity.
+
+```mermaid
+graph TD
+    Q[Software Product Quality<br/>ISO/IEC 25010:2023] --> FS[Functional Suitability]
+    Q --> PE[Performance Efficiency]
+    Q --> COMP[Compatibility]
+    Q --> IC[Interaction Capability<br/>renamed from Usability]
+    Q --> REL[Reliability<br/>maturity → faultlessness]
+    Q --> SEC[Security]
+    Q --> MAIN[Maintainability]
+    Q --> FLEX[Flexibility<br/>renamed from Portability, adds scalability]
+    Q --> SAFE[Safety 🆕]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef changed fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef added fill:#dcfce7,stroke:#15803d,color:#14532d
+    class Q start
+    class FS,PE,COMP,SEC,MAIN step
+    class IC,REL,FLEX changed
+    class SAFE added
+```
+
+Amber marks what changed from 2011; green marks the new characteristic.
 
 | Characteristic (2023) | Plain-English question | Where it's covered in this course |
 |---|---|---|
@@ -251,6 +283,15 @@ graph LR
     D -->|Full NFT suite: load, security, a11y, compatibility| E[Release]
     E -->|Monitoring = NFT in production| F[Production]
     F -.->|Findings feed back| A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E step
+    class F good
 ```
 
 The practical version of "start early": when a user story says "merchants can view

@@ -288,6 +288,15 @@ topic — precise usage matters:
 graph LR
     A["Ramp-up<br/>0 → target VUs<br/>gradually increasing"] --> B["Steady State<br/>target VUs held constant<br/>← metrics measured here"]
     B --> C["Ramp-down<br/>target VUs → 0<br/>observe recovery"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B step
+    class C good
 ```
 
 <details>
@@ -312,9 +321,9 @@ has a genuinely different architecture underneath, not just a different UI:
 
 | Tool | Language / Model | Architecture | Strengths | Trade-offs |
 |---|---|---|---|---|
-| **k6** | JavaScript test scripts, Go runtime | Each virtual user runs as a lightweight Go goroutine, not an OS thread | Very resource-efficient — goroutines are far cheaper than threads, so a single load-generator machine can drive a much larger number of virtual users than a JVM-based tool at comparable hardware. CLI/code-first, scripts version well in git, strong CI/CD fit. | Newer ecosystem than JMeter; GUI/reporting is less built-in out of the box (commonly paired with Grafana for visualization, fittingly, given how often the two show up together in real reports) |
+| **k6** | JavaScript or TypeScript test scripts, Go runtime | Each virtual user runs as a lightweight Go goroutine, not an OS thread | Very resource-efficient — goroutines are far cheaper than threads, so a single load-generator machine can drive a much larger number of virtual users than a JVM-based tool at comparable hardware. CLI/code-first, scripts version well in git, strong CI/CD fit. | Newer ecosystem than JMeter; GUI/reporting is less built-in out of the box (commonly paired with Grafana for visualization, fittingly, given how often the two show up together in real reports) |
 | **Apache JMeter** | Java, XML test plans (GUI-generated) | JVM-based; each virtual user is closer to a real OS/Java thread | The most widely adopted enterprise tool by a wide margin — huge plugin ecosystem, mature protocol support (HTTP, JDBC, JMS, SOAP and more), GUI-first so less coding-heavy to get started, deep institutional familiarity | Thread-per-VU is heavier than goroutine-per-VU, so driving very high virtual-user counts demands proportionally more load-generator hardware; XML test plans are harder to code-review than script-based tools |
-| **Gatling** | Scala DSL (or a Java/Kotlin API in newer versions) | JVM-based, but built on an async, event-driven engine (Akka/Netty-style) rather than one thread per user | Strong reporting out of the box, code-first test definitions that version well, generally more efficient than classic JMeter threading despite sharing the JVM | Still JVM-based under the hood, so it doesn't match k6's goroutine-level efficiency for extreme virtual-user counts on a single machine; Scala DSL has a steeper learning curve for teams without JVM background |
+| **Gatling** | Java, Kotlin, Scala, or JavaScript/TypeScript SDKs (Scala was the original DSL) | JVM-based, but built on an async, event-driven engine (Akka/Netty-style) rather than one thread per user | Strong reporting out of the box, code-first test definitions that version well, generally more efficient than classic JMeter threading despite sharing the JVM | Still JVM-based under the hood, so it doesn't match k6's goroutine-level efficiency for extreme virtual-user counts on a single machine; the Scala DSL that most older examples use has a steeper learning curve for teams without JVM background, though the Java and JS/TS SDKs remove most of that barrier |
 | **Locust** | Python | Python, event-driven (gevent-based) with a "distributed swarm" model for scaling across machines | Test scripts are plain Python — very approachable for teams already comfortable there, easy to express complex user-behavior logic in familiar code, built-in web UI for watching a run live | Python's per-process concurrency ceiling is lower than k6's Go model, so pushing very high VU counts typically means running Locust in a distributed/multi-worker setup rather than a single beefy machine |
 
 The honest summary, without inventing numbers nobody's confident in: **k6's Go-goroutine
@@ -414,8 +423,8 @@ minimum P95, ideally P99) and an explicit error-rate ceiling, not average latenc
 ## 2.9 Two Real Load Tests, Narrated
 
 Theory is easier to hold onto with real numbers attached to it. Here are two real load
-tests from this account's own portfolio — different products, different scale, same
-underlying discipline.
+tests from two fintech products: different products, different scale, same underlying
+discipline.
 
 ### Scenario 1 — Multi-merchant UPI collection, exercised through a live simulation dashboard
 
@@ -553,12 +562,12 @@ when multiple requests are simultaneously in flight.
 - Tool landscape: **k6** (Go goroutines, most VU-efficient per machine, code-first,
   CI/CD-native), **JMeter** (JVM/thread-based, GUI-first, the most widely deployed
   enterprise tool, huge protocol/plugin ecosystem), **Gatling** (JVM but async,
-  code-first Scala DSL), **Locust** (Python, approachable, distributed-swarm scaling).
+  code-first, with Java, Kotlin, Scala and JS/TS SDKs), **Locust** (Python, approachable, distributed-swarm scaling).
 - A load test plan needs three things to mean anything: the right
   business-critical flows (not "everything"), a *realistic* load model (ramped
   concurrency, real request mix, varied test data, think time — not "hit it as hard as
   possible"), and pass/fail thresholds traced back to a real SLA.
-- Real numbers from this portfolio: a Collection Engine JMeter test sustained
+- Real numbers from Section 2.9: a Collection Engine JMeter test sustained
   **42–45 TPS across 180,000 transactions over 3 hours** with a **0.01% error rate**
   and P90/P95/P99 of 95ms/240ms/900ms — and traced its P99 tail to **database
   connection pool saturation**.
